@@ -1,79 +1,271 @@
-# hide-fields
+Ticket Fields Manager
+=====================
 
-A Freshworks app that dynamically shows/hides ticket fields based on ticket type. Automatically hides Internal Notes for Refund tickets and sets priority to High, with state persistence across page refreshes.
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#ticket-fields-manager)
 
-## 🎯 Use Case
+A Freshworks app demonstrating dynamic ticket field visibility and platform capabilities using both Ticket Background and Ticket Sidebar locations simultaneously. The app automatically shows/hides the Internal Notes field based on ticket type, with state persistence across page refreshes.
 
-Automatically hide Internal Notes for Refund tickets while keeping them visible for all other ticket types. The app triggers **on ticket create** or **when ticket type changes**.
+## Screenshots
 
-## 🏗️ Architecture
+<table>
+<tr>
+<td width="50%">
 
-Uses **two app locations** working together:
+**Before:** Ticket with Internal Notes visible (Other ticket type)
 
-- **Ticket Background** - Runs silently, monitors ticket events, and manages field visibility
-- **Ticket Sidebar** - Provides UI to view and toggle ticket type
+![Before](screenshots/1.png)
 
-## 🛠️ Platform Features Demonstrated
+</td>
+<td width="50%">
 
-### App Locations
-- `ticket_background` - Background processing without UI
-- `ticket_sidebar` - User interface
+**After:** Ticket with Internal Notes hidden (Refund ticket type)
 
-### APIs Used
-- **Data API:** `client.data.get("ticket")` - Read ticket information
-- **Interface API:**
-  - `client.interface.trigger("setValue")` - Update field values
-  - `client.interface.trigger("show")` / `client.interface.trigger("hide")` - Control field visibility
-- **Events API:**
-  - `app.activated` - App initialization (ticket create/load)
-  - `ticket.typeChanged` - Type change detection
-  - `ticket.updated` - Ticket updates
-  - `ticket.propertiesLoaded` - Properties loaded (Freshservice)
+![After](screenshots/2.png)
 
-## 📋 Behavior
+</td>
+</tr>
+</table>
 
-**When Ticket Type = "Refund":**
-- ✅ Priority automatically set to **High** (value: 3)
-- ✅ Internal Notes field is **hidden**
-- ✅ State persists on page refresh
+🏗️ Architecture
+----------------
 
-**When Ticket Type = "Other" or any other type:**
-- ✅ Internal Notes field is **visible**
-- ✅ No automatic priority change
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#%EF%B8%8F-architecture)
 
-**Triggers:**
-- On ticket create (if type is already "Refund")
-- On ticket type change
-- On page refresh (state restored automatically)
+This app utilizes two app locations working together:
 
-## 🚀 Quick Start
+1.  Ticket Background (`ticket_background.html`) - Runs silently in the background
 
-```bash
-fdk run
-```
+    -   Monitors ticket type changes
+    -   Automatically shows/hides the Internal Notes field
+    -   Sets ticket priority for Refund tickets
+2.  Ticket Sidebar (`index.html`) - Provides a minimal UI
 
-Open a ticket in Freshdesk/Freshservice (append `?dev=true` to URL) and test the field visibility changes.
+    -   Displays current ticket type
+    -   Allows toggling between ticket types
+    -   Updates in real-time as ticket changes
 
-## 📁 Project Structure
+🔄 App Flow
+-----------
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#-app-flow)
+
+### Initial Load Flow
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#initial-load-flow)
 
 ```
-hide-fields/
-├── manifest.json                # App configuration
-├── app/
-│   ├── index.html              # Sidebar UI
-│   ├── ticket_background.html  # Background app
-│   ├── scripts/
-│   │   ├── app.js              # Background logic
-│   │   └── sidebar.js          # Sidebar logic
-│   └── styles/
-│       └── style.css
-└── config/
-    └── iparams.json
+1\. User opens a ticket in Freshdesk/Freshservice
+   ↓
+2. Both apps initialize simultaneously:
+   - Background app (app.js) subscribes to ticket events
+   - Sidebar app (sidebar.js) loads and displays current ticket type
+   ↓
+3. Background app checks ticket type:
+   ├─ If type = "Refund"
+   │  ├─ Set Priority = High (3)
+   │  └─ Hide Internal Notes field
+   └─ If type = "Other" or any other type
+      └─ Show Internal Notes field
+   ↓
+4. Sidebar displays current type and enables toggle button
+
 ```
 
-## 📚 Learn More
+### User Interaction Flow
 
-- [Freshworks Platform Documentation](https://developers.freshworks.com/docs/)
-- [Data API Reference](https://developers.freshworks.com/docs/data-api/)
-- [Interface API Reference](https://developers.freshworks.com/docs/interface-api/)
-- [Events API Reference](https://developers.freshworks.com/docs/events-api/)
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#user-interaction-flow)
+
+```
+User clicks "Toggle Ticket Type" button
+   ↓
+Sidebar app (sidebar.js):
+   ├─ Reads current ticket type
+   ├─ Determines new type (Refund ↔ Other)
+   └─ Calls setValue API to update ticket_type field
+   ↓
+Freshworks platform fires ticket.typeChanged event
+   ↓
+Background app (app.js) receives event:
+   ├─ Reads updated ticket data
+   ├─ Checks new ticket type
+   └─ Shows/hides Internal Notes accordingly
+   ↓
+Sidebar app receives ticket.typeChanged event:
+   └─ Updates UI to reflect new ticket type
+
+```
+
+### Page Refresh Flow
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#page-refresh-flow)
+
+```
+User refreshes the ticket page
+   ↓
+Both apps reinitialize
+   ↓
+Background app (app.js):
+   ├─ Reads ticket data (including persisted type)
+   ├─ Checks ticket.type value
+   └─ Automatically shows/hides Internal Notes based on type
+   ↓
+Sidebar app (sidebar.js):
+   └─ Displays current ticket type from persisted data
+
+```
+
+Key Point: The ticket type is persisted in the Freshworks database, so on refresh, both apps read the same persisted value and maintain consistent state.
+
+📁 Project Structure
+--------------------
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#-project-structure)
+
+```
+ticket-fields/
+├── README.md                    # This file
+├── manifest.json                # App configuration and location definitions
+├── config/
+│   └── iparams.json            # Installation parameters
+└── app/                         # Frontend assets
+    ├── index.html              # Sidebar UI (ticket_sidebar location)
+    ├── ticket_background.html  # Background app (ticket_background location)
+    ├── scripts/
+    │   ├── app.js              # Background logic - handles note visibility
+    │   └── sidebar.js          # Sidebar logic - UI and type toggling
+    └── styles/
+        ├── style.css           # Minimal styling for sidebar
+        └── images/
+            └── icon.svg        # App icon
+
+```
+
+🔑 Key Features Demonstrated
+----------------------------
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#-key-features-demonstrated)
+
+### 1\. Dual Location Architecture
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#1-dual-location-architecture)
+
+-   Background App: Handles business logic without UI
+-   Sidebar App: Provides user interaction interface
+-   Both apps communicate through Freshworks events
+
+### 2\. Dynamic Field Visibility
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#2-dynamic-field-visibility)
+
+-   Automatically hides Internal Notes for Refund tickets
+-   Shows Internal Notes for all other ticket types (including "Other")
+-   Visibility persists across page refreshes
+
+### 3\. Event-Driven Architecture
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#3-event-driven-architecture)
+
+-   Uses `ticket.typeChanged` event for real-time updates
+-   Responds to multiple events for reliability
+-   No polling required - reactive to changes
+
+### 4\. State Persistence
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#4-state-persistence)
+
+-   Ticket type is stored in Freshworks database
+-   On refresh, both apps read the same persisted state
+-   Note visibility automatically restored based on persisted type
+
+📋 Behavior Details
+-------------------
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#-behavior-details)
+
+### When Ticket Type = "Refund"
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#when-ticket-type--refund)
+
+-   ✅ Priority automatically set to High (value: 3)
+-   ✅ Internal Notes field is hidden
+-   ✅ Sidebar shows "Set to Other" button
+
+### When Ticket Type = "Other" (or any other type)
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#when-ticket-type--other-or-any-other-type)
+
+-   ✅ Internal Notes field is visible
+-   ✅ Sidebar shows "Set to Refund" button
+-   ✅ No automatic priority change
+
+### On Page Refresh
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#on-page-refresh)
+
+-   ✅ Background app reads persisted ticket type
+-   ✅ Note visibility automatically restored based on type
+-   ✅ Sidebar displays correct current type
+-   ✅ No manual intervention needed
+
+🧪 Testing
+----------
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#-testing)
+
+### Prerequisites
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#prerequisites)
+
+-   Freshworks FDK installed
+-   Node.js 18.20.8
+-   Freshdesk/Freshservice account
+
+### Steps
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#steps)
+
+1.  Start the app:
+
+    ```source-shell
+    fdk run
+    ```
+
+2.  Configure settings:
+
+    -   Navigate to <http://localhost:10001/system_settings>
+    -   Complete installation parameters if required
+3.  Test Background App:
+
+    -   Open a ticket in Freshdesk (append `?dev=true` to URL)
+    -   Change ticket type to "Refund"
+    -   Verify Internal Notes field disappears automatically
+    -   Verify Priority is set to High
+    -   Refresh the page - verify note remains hidden
+4.  Test Sidebar App:
+
+    -   Open the sidebar (if not already visible)
+    -   Verify current ticket type is displayed
+    -   Click "Toggle Ticket Type" button
+    -   Verify type changes and note visibility updates
+    -   Refresh page - verify state persists
+5.  Test State Persistence:
+
+    -   Set ticket type to "Other"
+    -   Refresh the page
+    -   Verify Internal Notes is visible
+    -   Set ticket type to "Refund"
+    -   Refresh the page
+    -   Verify Internal Notes is hidden
+/)
+📝 Notes
+--------
+
+[](https://github.com/freshworks-developers/hide-fields/tree/3b7a94a1f392352057639a06c8cee7bf10a22b26#-notes)
+
+-   The app uses a small delay (200ms) in the background app to ensure ticket data is fully loaded before processing
+-   Ticket type changes via `setValue` trigger the `ticket.typeChanged` event automatically
+-   The note visibility state is maintained by the background app, which runs on every ticket load/refresh
+-   Both apps work independently but share the same ticket data source
+
+hide-fields
+===========
