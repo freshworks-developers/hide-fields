@@ -11,14 +11,14 @@ A Freshworks app demonstrating dynamic ticket field visibility and platform capa
 <tr>
 <td width="50%">
 
-**Before:** Ticket with Internal Notes visible (Other ticket type)
+**Before:** Ticket with Internal Notes hidden (Refund ticket type)
 
 ![Before](screenshots/1.png)
 
 </td>
 <td width="50%">
 
-**After:** Ticket with Internal Notes hidden (Refund ticket type)
+**After:** Ticket with Internal Notes visible (Other ticket type)
 
 ![After](screenshots/2.png)
 
