@@ -3,25 +3,27 @@ Ticket Fields Manager: Dynamic UI & Logic Orchestration
 
 A robust Freshworks app demonstrating real-time ticket field manipulation and dual-location synchronization. It leverages **Ticket Background** for silent business logic (auto-hiding Internal Notes) and **Ticket Sidebar** for interactive UI, utilizing the **Platform v3 Event Bus** to maintain state consistency across page refreshes.
 
+## Screenshots
+
 <table>
-
 <tr>
-
 <td width="50%">
 
-**Before:** "Refund" type hides notes.
+**Before:** Ticket with Internal Notes hidden (Refund ticket type)
+
+![Before](screenshots/1.png)
 
 </td>
-
 <td width="50%">
 
-**After:** "Other" type reveals notes.
+**After:** Ticket with Internal Notes visible (Other ticket type)
+
+![After](screenshots/2.png)
 
 </td>
-
 </tr>
-
 </table>
+
 
 * * * * *
 
