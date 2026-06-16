@@ -1,0 +1,21 @@
+{
+  "name": "hide-fields",
+  "version": "1.0.0",
+  "description": "Hide Fields — React Meta sample (Interface Methods + background rules)",
+  "dependencies": {
+    "@freshworks/crayons": "^4.2.0",
+    "react": "~18.2.0",
+    "react-dom": "~18.2.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "~7.24.0",
+    "@babel/preset-react": "~7.23.3",
+    "@vitest/coverage-v8": "~2.1.8",
+    "jsdom": "~26.1.0",
+    "vite": "~5.0.0",
+    "vitest": "~2.1.8"
+  },
+  "scripts": {
+    "test": "vitest run --coverage"
+  }
+}

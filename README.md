@@ -1,177 +1,135 @@
-Ticket Fields Manager: Dynamic UI & Logic Orchestration
-=======================================================
+<p align="center">
+  <img src="hide-fields.png" alt="Hide Fields" width="100%" />
+</p>
 
-A robust Freshworks app demonstrating real-time ticket field manipulation and dual-location synchronization. It leverages **Ticket Background** for silent business logic (auto-hiding Internal Notes) and **Ticket Sidebar** for interactive UI, utilizing the **Platform v3 Event Bus** to maintain state consistency across page refreshes.
+# Hide Fields
 
-## Screenshots
+A Freshworks Platform 3.0 **React Meta** sample app that demonstrates conditional ticket field visibility using **Interface Methods**, **Data Methods**, and dual-location synchronization between **ticket background** and **ticket sidebar**.
 
-<table>
-<tr>
-<td width="50%">
+## Description
 
-**Before:** Ticket with Internal Notes hidden (Refund ticket type)
+Refund workflows often need a streamlined ticket view — high priority, no internal notes clutter. Hide Fields automates that behavior in the background while the sidebar provides an interactive **Properties widget** playground for `hide`, `show`, `enable`, and `disable`, with per-ticket persistence.
 
-![Before](screenshots/1.png)
+### Core Functionality
 
-</td>
-<td width="50%">
+1. **Automatic field rules (background)** — when ticket type is Refund, set priority to High and hide Internal Notes; show notes for all other types.
+2. **Properties widget controls (sidebar)** — Show/Hide/Enable/Disable for `status`, `priority`, `ticket_type`, `group`, `product`, and `tag` with persisted button selection per ticket.
 
-**After:** Ticket with Internal Notes visible (Other ticket type)
+## User Interfaces
 
-![After](screenshots/2.png)
-
-</td>
-</tr>
-</table>
-
-
-* * * * *
-
-📋 Table of Contents
---------------------
-
--   [Overview](https://www.google.com/search?q=%23ticket-fields-manager-dynamic-ui--logic-orchestration)
-
--   [Key Features](https://www.google.com/search?q=%23-key-features)
-
--   [Architecture: Dual-Location Sync](https://www.google.com/search?q=%23-architecture-dual-location-sync)
-
--   [Feature to Implementation Mapping](https://www.google.com/search?q=%23-feature-to-implementation-mapping)
-
--   [Project Structure](https://www.google.com/search?q=%23-project-structure)
-
--   [Setup Guide](https://www.google.com/search?q=%23-setup-guide)
-
--   [Troubleshooting](https://www.google.com/search?q=%23-troubleshooting)
-
--   [Resources](https://www.google.com/search?q=%23-resources)
-
-* * * * *
-
-🚀 Key Features
----------------
-
-### 1\. Conditional Field Visibility
-
-Automatically toggles the visibility of the "Internal Notes" field based on the ticket category. This reduces **Agent Cognitive Load** by removing irrelevant fields for specific workflows (e.g., Refund requests).
-
-### 2\. Automated Attribute Enforcement
-
-Leverages the **Data Methods API** to automatically escalate ticket priority to "High" when a "Refund" type is detected, ensuring critical tickets meet SLA requirements without manual intervention.
-
-### 3\. Reactive UI Synchronization
-
-The Sidebar and Background locations communicate via **Data Events**. When a user toggles the ticket type in the sidebar, the background script instantly reacts to modify the field visibility in real-time.
-
-* * * * *
-
-🏗 Architecture: Dual-Location Sync
------------------------------------
-
-The app employs a "Headless Logic + Interactive UI" pattern to ensure business rules are enforced even if the sidebar is closed.
-
-### 1\. Headless Logic (Background)
-
--   **Flow**: Handled via `ticket_background.html` and `app.js`.
-
--   **Engineering Rationale**: By placing visibility logic in the background, the app ensures that field-level security and UI rules are applied immediately upon ticket load, independent of the sidebar's lifecycle.
-
-### 2\. State-Aware UI (Sidebar)
-
--   **Flow**: Handled via `index.html` and `sidebar.js`.
-
--   **Engineering Rationale**: Provides a dedicated control point for agents. It subscribes to `ticket.typeChanged` events to remain a "source of truth" for the current ticket state.
-
-* * * * *
-
-🔗 Feature to Implementation Mapping
-------------------------------------
-
-| **Functionality** | **Platform Module** | **Path** | **Engineering Rationale** |
-| --- | --- | --- | --- |
-| **Field Hiding** | Interface API | `app/scripts/app.js` | Uses `client.interface.trigger("hide", ...)` for dynamic UI control. |
-| **Type Management** | Data Methods | `app/scripts/sidebar.js` | Uses `client.data.set("ticket", ...)` to persist changes to the database. |
-| **Event Monitoring** | App Events | `app/scripts/app.js` | Listens to `ticket.typeChanged` for reactive, zero-polling updates. |
-| **UI Interaction** | Ticket Sidebar | `app/index.html` | Provides a manual override for ticket types within the native sidebar. |
-
-* * * * *
-
-📂 Project Structure
---------------------
-
-Plaintext
-
-```
-.
-├── app/                        # Frontend Assets
-│   ├── index.html              # Sidebar UI Entry Point
-│   ├── ticket_background.html  # Background Logic Entry Point
-│   ├── scripts/
-│   │   ├── app.js              # Background Logic (Field Visibility)
-│   │   └── sidebar.js          # Sidebar Logic (UI & State Toggling)
-│   └── styles/
-│       └── style.css           # Minimal sidebar styling
-├── config/                     # Configuration
-│   └── iparams.json            # Installation Parameters
-├── manifest.json               # Location & Permission Definitions
-└── README.md                   # Documentation
-
-```
-
-* * * * *
-
-🛠 Setup Guide
---------------
-
-### 1\. Prerequisites
-
--   **Freshworks CLI (FDK)**: Installed and authenticated.
-
--   **Node.js**: Version 18.20.8 (LTS).
-
--   **Freshdesk Account**: Admin access for testing custom apps.
-
-### 2\. Configuration
-
--   **Installation Parameters**: Open `http://localhost:10001/custom_configs` to set any required local parameters.
-
--   **Ticket Fields**: Ensure your Freshdesk instance has a field named `Internal Notes` (system name: `internal_note`).
-
-### 3\. Installation
-
-1.  **Run Locally**:
-
-    Bash
-
-    ```
-    fdk run
-
-    ```
-
-2.  **Verify**: Log into Freshdesk, open a ticket, and append `?dev=true` to the URL.
-
-3.  **Test**: Change the ticket type to "Refund" and observe the Internal Notes field disappearing instantly.
-
-* * * * *
-
-⚠️ Troubleshooting
-------------------
-
-| **Error Code / Symptom** | **Common Cause** | **Resolution** |
+| Surface | Placement | Behavior |
 | --- | --- | --- |
-| **Field doesn't hide** | Async loading race condition | The app includes a 200ms delay; ensure the field ID matches your instance. |
-| **Type not persisting** | Missing API Permissions | Check `manifest.json` to ensure `ticket` data methods are authorized. |
-| **Sidebar is blank** | Stylesheet or Script error | Check the browser console (Inspect Element) for local file path errors. |
+| `app/ticket_background.html` | `support_ticket.ticket_background` | Headless logic: hide/show `note`, set `priority` on Refund |
+| `app/ticketSidebar.html` | `support_ticket.ticket_sidebar` | React sidebar: Properties widget Show/Hide/Enable/Disable with persisted selection |
 
-* * * * *
+## Platform 3.0 Features Used
 
-📚 Resources
-------------
+### 1. Interface Methods — Field Visibility
 
--   [Freshworks Interface API Docs](https://developers.freshworks.com/docs/apps/v3/app-locations/ticket-sidebar/%23interface-api)
+Background and sidebar call `client.interface.trigger()` with actions `hide`, `show`, `enable`, and `disable`:
 
--   [Data Methods Documentation](https://developers.freshworks.com/docs/apps/v3/app-locations/ticket-sidebar/%23data-api)
+```javascript
+await client.interface.trigger('hide', { id: 'note' });
+await client.interface.trigger('show', { id: 'status' });
+await client.interface.trigger('disable', { id: 'priority' });
+```
 
--   [Sample App Gallery](https://github.com/freshworks-developers)
+The sidebar persists each field’s last selected action per ticket in `localStorage`. On refresh, it re-applies saved actions silently and highlights the selected button.
 
-* * * * *
+### 2. Data Methods — Ticket Context
+
+Both locations read ticket type with `client.data.get('ticket')`. The sidebar writes type changes with `setValue` on `ticket_type`.
+
+### 3. App Events — Dual-Location Sync
+
+The background script listens to `app.activated`, `ticket.updated`, `ticket.typeChanged`, and `ticket.propertiesLoaded`. When the sidebar toggles type, the background applies field rules without polling.
+
+### 4. Crayons UI Components
+
+| Component | Usage |
+| --- | --- |
+| `<fw-button>` | Show/Hide/Enable/Disable actions with primary color for the active selection |
+| `<fw-spinner>` | Loading state before catalog renders |
+
+## Project Structure
+
+```
+├── app/
+│   ├── ticketSidebar.html      # Ticket sidebar shell (React Meta entry)
+│   ├── ticket_background.html  # Background entry (headless logic)
+│   ├── scripts/
+│   │   └── app.js              # Background hide/show and priority rules
+│   ├── components/
+│   │   ├── bootstrap/
+│   │   │   └── crayonsInit.js   # Crayons loader + CSS
+│   │   └── placeholders/
+│   │       ├── PlaceholderWrapper.jsx
+│   │       ├── ticketSidebar.jsx
+│   │       └── TicketSidebarApp.jsx
+│   └── styles/
+│       ├── style.css
+│       └── images/
+│           └── icon.svg
+├── config/
+│   └── iparams.json
+├── tests/
+│   └── app.test.js
+├── manifest.json
+├── package.json
+├── usecase.md
+└── vitest.config.js
+```
+
+## Prerequisites
+
+- [Freshworks CLI (FDK)](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/basic-dev-tools/freshworks-cli/) v10.1.2 or later
+- Node.js v24.x
+- A Freshdesk trial account with ticket types including **Refund** and **Other**
+
+Enable global apps before local development:
+
+```bash
+fdk config set global_apps.enabled true
+```
+
+## Local Development
+
+1. Clone the repository and enter the app directory:
+   ```bash
+   git clone <repo-url>
+   cd hide-fields
+   ```
+2. Install dependencies and validate:
+   ```bash
+   npm install
+   fdk validate
+   ```
+3. Run the app locally:
+   ```bash
+   fdk run
+   ```
+4. Open a Freshdesk ticket with `?dev=true`:
+   ```
+   https://your-domain.freshdesk.com/a/tickets/1?dev=true
+   ```
+5. Test the workflow:
+   - Set ticket type to **Refund** in the native properties panel — Internal Notes should hide and priority should become High.
+   - In the sidebar, click **Hide** on a property field — the button stays highlighted and the choice persists when you refresh the ticket.
+
+## Testing
+
+```bash
+npm test
+```
+
+## Key Learnings
+
+1. **Background + sidebar** — put enforcement logic in `ticket_background` so rules apply even when the sidebar is closed; use the sidebar for agent controls and method exploration.
+2. **React Meta for sidebars** — React Meta apps can ship multiple UI surfaces while keeping Platform 3.0 initialization (`app.initialized()`) and lifecycle events intact.
+3. **Interface method IDs** — use documented element IDs (`note`, `status`, `priority`, etc.); hide/show removes visibility while enable/disable controls editability.
+
+## Resources
+
+- [Interface Methods](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/front-end-apps/interface-methods/)
+- [Data Methods](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/front-end-apps/data-method/)
+- [Ticket Background Location](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/app-locations/ticket-background/)

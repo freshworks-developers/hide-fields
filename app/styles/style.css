@@ -10,24 +10,237 @@ html {
 
 body {
   margin: 0;
-  padding: 8px;
+  padding: 12px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  color: #183247;
+  line-height: 1.45;
 }
 
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.container {
+  max-width: none;
+  padding-bottom: 16px;
+}
+
+h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.section-desc {
+  color: #475867;
+  margin: 0 0 10px;
+  font-size: 12px;
+}
+
+.section-desc code {
+  font-size: 11px;
+  background: #f0f3f5;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.workflow-section {
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5e9ed;
+}
+
+.catalog-section h3 {
+  margin-bottom: 6px;
 }
 
 .status-text {
-  margin: 0;
+  margin: 0 0 8px;
   font-size: 12px;
   color: #555;
-  padding: 4px 0;
 }
 
 .action-btn {
   width: 100%;
   font-size: 12px;
+}
+
+.sidebar-frame {
+  min-height: 100%;
+  overflow-y: auto;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.btn-row fw-button {
+  margin: 0;
+  flex: 0 1 auto;
+}
+
+.btn-row fw-button[color='primary'] {
+  --fw-button-background-color: #2c5cc5;
+  --fw-button-border-color: #2c5cc5;
+  --fw-button-text-color: #fff;
+}
+
+.accordion-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.catalog-panel {
+  border: 1px solid #e5e9ed;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.catalog-panel-title {
+  font-weight: 400;
+  font-size: 12px;
+  color: #183247;
+  padding: 10px 28px 10px 12px;
+  cursor: pointer;
+  list-style: none;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+  position: relative;
+  user-select: none;
+}
+
+.catalog-panel-title::-webkit-details-marker {
+  display: none;
+}
+
+.catalog-panel-title::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid #6f7c87;
+  border-bottom: 1.5px solid #6f7c87;
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.catalog-panel[open] .catalog-panel-title::after {
+  transform: translateY(-30%) rotate(-135deg);
+}
+
+.catalog-panel[open] .catalog-panel-title {
+  border-bottom: 1px solid #e5e9ed;
+}
+
+.catalog-panel-body {
+  padding: 10px 12px 12px;
+}
+
+.panel-subtitle {
+  color: #475867;
+  font-size: 11px;
+  margin: 0 0 10px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.button-group {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f3f5;
+}
+
+.button-group:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.button-group-label {
+  font-size: 11px;
+  color: #6f7c87;
+  margin: 0 0 6px;
+  font-weight: 400;
+}
+
+.group-heading {
+  font-size: 11px;
+  color: #475867;
+  margin: 4px 0 8px;
+  font-weight: 400;
+  padding-top: 4px;
+  border-top: 1px solid #f0f3f5;
+}
+
+.group-heading:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.catalog-panel .btn-row:last-child {
+  margin-bottom: 0;
+}
+
+.hint {
+  font-size: 11px;
+  color: #6f7c87;
+  margin-top: 4px;
+}
+
+/* React Meta sidebar */
+.hf-root {
+  padding-bottom: 12px;
+}
+
+.hf-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hf-subtitle {
+  color: #475867;
+  margin: 0 0 12px;
+  font-size: 12px;
+}
+
+.hf-loadingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hf-hint {
+  font-size: 11px;
+  color: #6f7c87;
+}
+
+.hf-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hf-field {
+  border: 1px solid #e5e9ed;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+}
+
+.hf-fieldLabel {
+  font-size: 11px;
+  color: #6f7c87;
+  margin-bottom: 8px;
+}
+
+.hf-btnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }

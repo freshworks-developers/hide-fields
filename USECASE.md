@@ -1,70 +1,50 @@
-# Use Case: Damazon Customer Support
+Use Cases - Hide Fields / Damazon Customer Support
+===================================================
 
-## Company Overview
+Company Overview
+----------------
 
-**Damazon** is a global e-commerce platform that handles millions of customer inquiries daily. Their customer support team manages various types of tickets including order issues, refunds, product inquiries, shipping problems, and account management.
+**Damazon** is a global e-commerce company utilizing **Freshdesk** to manage millions of customer inquiries daily, including order issues, refunds, product questions, and account management across tiered support workflows.
 
-## Business Challenge
+* * * * *
 
-Damazon's support team faced several operational challenges:
+Use Case Scenarios
+------------------
 
-1. **Refund Processing Inefficiency**
-   - Refund tickets weren't consistently marked as high priority
-   - Agents added unnecessary notes, slowing down the streamlined refund workflow
-   - Manual field management was time-consuming and error-prone
+### 1\. Refund Ticket Streamlining
 
-2. **Inconsistent Field Visibility**
-   - Field visibility wasn't consistent across page refreshes
-   - Agents had to manually configure fields based on ticket type
+**Scenario**: During peak refund seasons, refund specialists process hundreds of tickets per day. Internal Notes fields and optional properties slow down a workflow that should be fast and consistent.
 
-## Solution
+**Use Case**: The background app detects ticket type **Refund**, sets priority to High, and hides the Internal Notes field via Interface Methods. Specialists see a streamlined ticket view automatically — even when the sidebar app is closed — because rules run in `ticket_background`.
 
-Damazon implemented the Ticket Fields Manager app to automate ticket field management based on ticket type, ensuring consistent behavior and improved operational efficiency.
+* * * * *
 
-## How It Works
+### 2\. Automated Priority Enforcement
 
-### Refund Tickets
-When ticket type is set to "Refund":
-- ✅ Priority automatically set to High (3)
-- ✅ Notes field is hidden (streamlined workflow)
-- ✅ State persists on page refresh
+**Scenario**: Refund tickets were inconsistently prioritized manually; SLA breaches on high-value refunds cost Damazon revenue and customer trust.
 
-### Standard Tickets
-When ticket type is "Question", "Issue", "Other", or any non-Refund type:
-- ✅ Notes field is visible (team collaboration)
-- ✅ No automatic priority change
-- ✅ Full field access maintained
+**Use Case**: When type is Refund, the app calls `setValue` on `priority` to High (3) on every ticket load and type change. Priority assignment is no longer dependent on agent memory or training drift — compliance reaches 100% for the refund queue.
 
-### User Interaction
-- Sidebar displays current ticket type
-- One-click toggle between "Refund" and "Other"
-- Field visibility updates automatically
-- Changes persist across page refreshes
+* * * * *
 
-## Business Impact
+### 3\. Properties Widget Customization per Team
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Refund Processing Time | 4-6 hours | 2-3 hours | 50% faster |
-| Priority Consistency | 60% | 100% | Fully automated |
-| Workflow Compliance | Variable | 100% | Standardized |
-| Agent Training Time | 2 hours | 30 minutes | 75% reduction |
+**Scenario**: Tier 1 agents need full access to status, priority, and tags, while refund specialists should hide or disable fields they must not edit during triage.
 
-## Key Benefits
+**Use Case**: The React sidebar exposes Show, Hide, Enable, and Disable controls for core property fields (`status`, `priority`, `ticket_type`, `group`, `product`, `tag`). Each agent's last selection persists per ticket in `localStorage` and re-applies on refresh with the active button highlighted.
 
-1. **Automatic Priority Assignment** - Refund tickets automatically get High priority, ensuring fast processing
-2. **Dynamic Field Visibility** - Notes field hidden for refunds (streamlined), visible for other types (collaboration)
-3. **State Persistence** - Field visibility maintained across page refreshes
-4. **Dual App Architecture** - Background app handles automation, sidebar provides quick type toggle
+* * * * *
 
-## Integration
+### 4\. Workflow Compliance Across Page Refreshes
 
-- **Tier 1 Agents:** Handle general inquiries with full note functionality
-- **Refund Specialists:** Process refunds with streamlined interface (no notes field)
-- **Supervisors:** Benefit from consistent prioritization and workflow compliance
+**Scenario**: Agents refresh tickets or navigate away mid-session; manually hidden fields and priority changes were lost, causing rework and inconsistent customer experiences.
 
-Refund tickets are automatically prioritized and routed to specialists, with field visibility reducing confusion and enforcing workflow adherence.
+**Use Case**: Background logic listens to `app.activated`, `ticket.updated`, `ticket.typeChanged`, and `ticket.propertiesLoaded` to re-apply Refund rules without polling. Sidebar persistence re-applies saved property visibility silently on load, keeping UI state aligned with business rules.
 
-## Conclusion
+* * * * *
 
-The Ticket Fields Manager app transformed Damazon's customer support operations by automating field management, streamlining refund workflows, and ensuring consistent behavior across all agents. This simple automation resulted in 50% faster refund processing and 100% workflow compliance.
+### 5\. Role-Based Field Visibility Training
+
+**Scenario**: Damazon onboards refund specialists and tier 1 agents with different field-access expectations. Trainers need a safe sandbox to demonstrate Interface Methods on live tickets.
+
+**Use Case**: Hide Fields serves as both production automation (background) and an interactive catalog (sidebar). Trainers demo `hide`, `show`, `enable`, and `disable` on property fields while new hires practice on trial accounts, learning documented element IDs before building custom apps.
